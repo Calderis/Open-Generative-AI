@@ -58,12 +58,12 @@ This is the most complex component. It handles:
 
 ### `replicate.js` (The Engine)
 Encapsulates all communication with `api.replicate.com`.
-- **Authentication:** Uses `x-api-key` header (NOT `Authorization: Bearer`).
+- **Authentication:** Uses `Authorization: Bearer {token}` header.
 - **Pattern:** Submit -> Poll.
-    - `POST` to endpoint (e.g., `/api/v1/nano-banana-pro`).
-    - API returns a `request_id`.
-    - `POST` / `GET` loop on `/api/v1/predictions/{id}/result` until status is `completed`, `succeeded`, or `failed`.
-- **Normalization:** The polling response structure varies. `replicate.js` normalizes the result to ensure `url` is always populated (extracting from `outputs[0]` if necessary).
+    - `POST` to `/v1/predictions` with model version and input parameters.
+    - API returns a `prediction_id`.
+    - `GET` loop on `/v1/predictions/{id}` until status is `succeeded`, `failed`, or `canceled`.
+- **Normalization:** The polling response structure returns an `output` field. `replicate.js` normalizes the result to ensure `url` is always populated (extracting from `output[0]` for array outputs).
 
 ### `models.js` (The Data)
 Contains the `t2iModels` array.

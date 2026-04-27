@@ -3,7 +3,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     base: './',
     server: {
-        // Replicate API doesn't need a proxy - requests go directly to api.replicate.com
+        // Replicate API supports CORS from browser origins by default
+        // The proxy below is optional and only needed if you encounter CORS issues in development
+        // or want to route requests through the Next.js middleware for logging/debugging
         // For local development with CORS restrictions, uncomment the proxy below:
         // proxy: {
         //     '/api': {

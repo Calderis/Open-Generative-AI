@@ -41,6 +41,8 @@ export class ReplicateClient {
         };
 
         // Map aspect ratio to width/height if needed
+        // Note: Some models use aspect_ratio parameter, others use width/height
+        // If resolution is provided, it may override width/height depending on the model
         if (params.aspect_ratio) {
             const [w, h] = params.aspect_ratio.split(':').map(Number);
             if (w && h) {
@@ -57,7 +59,7 @@ export class ReplicateClient {
             }
         }
 
-        // Resolution override
+        // Resolution override (some models use this instead of width/height)
         if (params.resolution) {
             input.resolution = params.resolution;
         }
@@ -441,7 +443,11 @@ export class ReplicateClient {
         
         return new Promise((resolve, reject) => {
             if (file.size > MAX_DATA_URL_FILE_SIZE) {
-                reject(new Error(`File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). Please use an external CDN.`));
+                reject(new Error(
+                    `File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). ` +
+                    `Please host files externally using a CDN service (e.g., AWS S3, Cloudinary, ImgBB) ` +
+                    `and pass the URL instead. See REPLICATE_MIGRATION.md for details.`
+                ));
                 return;
             }
 

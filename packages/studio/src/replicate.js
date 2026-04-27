@@ -182,10 +182,15 @@ export async function generateI2V(apiKey, params) {
 
 export async function generateMarketingStudioAd(apiKey, params) {
     // Marketing studio ad generation requires a specific Replicate model
-    // This should be configured with an actual model version
+    // Unlike other generation functions, this expects replicateVersion to be passed in params
+    // rather than looked up from models.js, allowing for dynamic model selection
     const modelVersion = params.replicateVersion;
     if (!modelVersion) {
-        throw new Error('Marketing Studio Ad generation requires a valid Replicate model version. Please configure replicateVersion in model settings.');
+        throw new Error(
+            'Marketing Studio Ad generation requires a valid Replicate model version. ' +
+            'Pass replicateVersion in the params object (e.g., params.replicateVersion = "owner/model:version"). ' +
+            'Find models at https://replicate.com/explore'
+        );
     }
     
     const input = {
@@ -220,7 +225,11 @@ export function uploadFile(apiKey, file, onProgress) {
         // Replicate doesn't have a file upload endpoint
         // Convert to data URL for small files
         if (file.size > MAX_DATA_URL_FILE_SIZE) {
-            reject(new Error(`File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). Please host files externally.`));
+            reject(new Error(
+                `File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). ` +
+                `Please host files externally using a CDN service (e.g., AWS S3, Cloudinary, ImgBB) ` +
+                `and pass the URL instead. See REPLICATE_MIGRATION.md for details.`
+            ));
             return;
         }
 
