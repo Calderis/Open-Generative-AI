@@ -1,5 +1,8 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 
+// Maximum file size for data URL conversion (4MB)
+const MAX_DATA_URL_FILE_SIZE = 4 * 1024 * 1024;
+
 export class ReplicateClient {
     constructor() {
         this.baseUrl = 'https://api.replicate.com';
@@ -436,8 +439,8 @@ export class ReplicateClient {
         // For production, you'd want to host files on your own CDN or use a service like S3
         
         return new Promise((resolve, reject) => {
-            if (file.size > 4 * 1024 * 1024) { // 4MB limit for data URLs
-                reject(new Error('File too large for data URL. Please use an external CDN.'));
+            if (file.size > MAX_DATA_URL_FILE_SIZE) {
+                reject(new Error(`File too large for data URL (max ${MAX_DATA_URL_FILE_SIZE / (1024 * 1024)}MB). Please use an external CDN.`));
                 return;
             }
 
