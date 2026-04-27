@@ -12,7 +12,9 @@ export function middleware(request) {
         // Remap /api/v1 ONLY if it's not handled by a specific route.
         // Note: Replicate API uses api.replicate.com, not api.muapi.ai
         if (url.pathname.startsWith('/api/v1')) {
-            const targetUrl = new URL(url.pathname + url.search, 'https://api.replicate.com');
+            // Strip the /api prefix: /api/v1/predictions -> /v1/predictions
+            const pathWithoutApi = url.pathname.replace('/api', '');
+            const targetUrl = new URL(pathWithoutApi + url.search, 'https://api.replicate.com');
             return NextResponse.rewrite(targetUrl);
         }
     }
