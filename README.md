@@ -478,9 +478,20 @@ The app communicates with [Replicate.com](https://replicate.com) using a standar
 
 Authentication uses the `Authorization: Bearer {token}` header. File uploads are handled as data URLs for small files, or you can host files externally (e.g., on S3 or CDN) and pass URLs to Replicate.
 
-File uploads use `POST /api/v1/upload_file` (multipart/form-data) and return a hosted URL that is passed to image-conditioned models. For multi-image models the full `images_list` array is forwarded to the API in one request.
+### ⚠️ Important Note: Model Configuration
 
-Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` method accepts `image_url` or `video_url` alongside `audio_url`, dispatches to the model's endpoint, and polls until the output video URL is available.
+The migration from Muapi to Replicate requires updating model configurations in `packages/studio/src/models.js`. Each model needs a `replicateVersion` field added with the corresponding Replicate model version string (e.g., `"black-forest-labs/flux-dev:latest"`).
+
+Currently, the code falls back to using the existing `endpoint` field as a placeholder. To get full functionality:
+1. Find the equivalent model on [replicate.com/explore](https://replicate.com/explore)
+2. Add a `replicateVersion` field to each model in `models.js`
+3. Example: `{ id: "flux-dev", name: "Flux Dev", replicateVersion: "black-forest-labs/flux-dev:latest", ... }`
+
+For a complete list of available models, visit the [Replicate model explorer](https://replicate.com/explore).
+
+File uploads use data URLs for files under 4MB. For larger files, host them externally (S3, CDN, etc.) and pass the URL.
+
+Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` method accepts `image` or `video` alongside `audio`, dispatches to the model, and polls until the output video URL is available.
 
 ## 🎨 Supported Model Categories
 
