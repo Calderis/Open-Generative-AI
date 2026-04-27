@@ -181,13 +181,22 @@ export async function generateI2V(apiKey, params) {
 }
 
 export async function generateMarketingStudioAd(apiKey, params) {
-    // Marketing studio ad generation uses a different pattern than other generation functions
-    // Reason: Marketing ads may use various video generation models depending on resolution/quality
-    // Rather than hardcoding model mappings in models.js, this allows the caller to specify
-    // the exact Replicate model version dynamically based on their requirements
+    // ⚠️ INTENTIONAL PATTERN DEVIATION - DO NOT CHANGE WITHOUT REVIEWING ARCHITECTURE
     // 
-    // Unlike other generation functions that look up models from models.js, this expects
-    // replicateVersion to be passed directly in params for flexibility
+    // Marketing Studio uses a different pattern than other generation functions in this codebase.
+    // This deviation is intentional and serves Marketing Studio's unique requirements.
+    //
+    // Reason for deviation:
+    // - Marketing ads use various video generation models depending on resolution/quality settings
+    // - Rather than hardcoding multiple model mappings in models.js, this allows callers to
+    //   dynamically specify the exact Replicate model based on their current requirements
+    // - This flexibility is essential for Marketing Studio's multi-resolution ad generation workflow
+    //
+    // Pattern: Unlike other functions that look up models from models.js, this function expects
+    // replicateVersion to be passed directly in the params object.
+    //
+    // MAINTAINER NOTE: Preserve this pattern unless Marketing Studio's architecture changes
+    // to use a fixed set of models that can be statically defined in models.js
     const modelVersion = params.replicateVersion;
     if (!modelVersion) {
         throw new Error(

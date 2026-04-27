@@ -41,8 +41,12 @@ export class ReplicateClient {
         };
 
         // Map aspect ratio to width/height if needed
-        // Note: Some models use aspect_ratio parameter, others use width/height
-        // If resolution is provided, it may override width/height depending on the model
+        // Note: Different Replicate models accept different dimension parameters:
+        // - Some models use aspect_ratio (e.g., "16:9")
+        // - Some models use width/height (calculated here from aspect ratio)
+        // - Some models use resolution (e.g., "1080p")
+        // If both width/height and resolution are set, most models prioritize resolution.
+        // This implementation sends both to maximize model compatibility.
         if (params.aspect_ratio) {
             const [w, h] = params.aspect_ratio.split(':').map(Number);
             if (w && h) {
@@ -60,6 +64,7 @@ export class ReplicateClient {
         }
 
         // Resolution override (some models use this instead of width/height)
+        // If present, most models will use this parameter and ignore width/height
         if (params.resolution) {
             input.resolution = params.resolution;
         }
