@@ -4,16 +4,17 @@ export function middleware(request) {
     const url = request.nextUrl;
     
     // Catch requests to /api/workflow, /api/app, and /api/v1
-    const isMuApi = url.pathname.startsWith('/api/workflow') || 
-                    url.pathname.startsWith('/api/app') || 
-                    url.pathname.startsWith('/api/v1');
+    const isApiProxy = url.pathname.startsWith('/api/workflow') || 
+                      url.pathname.startsWith('/api/app') || 
+                      url.pathname.startsWith('/api/v1');
 
-    if (isMuApi) {
+    if (isApiProxy) {
         // Remap /api/v1 ONLY if it's not handled by a specific route.
-        // Actually, we'll let existing remapping for /api/v1 stay if needed,
-        // but we'll remove app/workflow as they need special handling.
+        // Note: Replicate API uses api.replicate.com, not api.muapi.ai
         if (url.pathname.startsWith('/api/v1')) {
-            const targetUrl = new URL(url.pathname + url.search, 'https://api.muapi.ai');
+            // Strip the /api prefix: /api/v1/predictions -> /v1/predictions
+            const pathWithoutApi = url.pathname.replace('/api', '');
+            const targetUrl = new URL(pathWithoutApi + url.search, 'https://api.replicate.com');
             return NextResponse.rewrite(targetUrl);
         }
     }

@@ -109,7 +109,7 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/vite": "^4.1.18",
     "autoprefixer": "^10.4.24",
-    "electron": "^33.4.11",
+    "electron": "^39.8.1",
     "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "^15.0.0",

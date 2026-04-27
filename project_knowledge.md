@@ -7,7 +7,7 @@ This document serves as a comprehensive knowledge base for the Open Generative A
 **Open Generative AI** is an ambitious open-source project dedicated to **replicating the full functionality of the Higgsfield platform**.
 
 - **Core Goal:** To build a feature-complete, self-hosted alternative to Higgsfield, starting with **Image Generation** (Nano) and expanding into **Video Generation** (Cinema) and other creative tools.
-- **Current State:** The Image Studio ("Nano Banana Pro" interface) is fully operational, featuring a premium dark-mode UI, history management, and multi-model support via the [Muapi.ai](https://muapi.ai) engine.
+- **Current State:** The Image Studio ("Nano Banana Pro" interface) is fully operational, featuring a premium dark-mode UI, history management, and multi-model support via the [Replicate.com](https://replicate.com) engine.
 - **Future Direction:** The architecture is designed to scale for video generation, model training interfaces, and advanced editing tools, mirroring the evolving capabilities of Higgsfield.
 
 - **Stack:** Vite, Vanilla JavaScript, Tailwind CSS v4.
@@ -27,7 +27,7 @@ src/
 │   ├── SettingsModal.js   # Panel for managing settings (clearing API key).
 │   └── Sidebar.js        # (Currently unused/placeholder) Navigation sidebar.
 ├── lib/
-│   ├── muapi.js          # The API Client. Handles auth, submission, and polling.
+│   ├── replicate.js          # The API Client. Handles auth, submission, and polling.
 │   └── models.js         # Source of truth for model definitions and endpoints.
 ├── styles/
 │   ├── global.css        # Global resets, fonts, and animation keyframes.
@@ -48,22 +48,22 @@ This is the most complex component. It handles:
     - **Quality/Resolution:** Only appears for models with explicit resolution support (like `nano-banana-pro`). Hidden for others (like `flux-schnell`).
 - **Generation Flow:**
     1. Checks for API key in `localStorage`. If missing, opens `AuthModal`.
-    2. Calls `muapi.generateImage()`.
+    2. Calls `replicate.generateImage()`.
     3. Polling loop waits for result.
     4. On success, adds result to `generationHistory` and displays it.
 - **History:**
-    - Stored in `localStorage` key `muapi_history`.
+    - Stored in `localStorage` key `replicate_history`.
     - Slides in from the right sidebar.
     - Thumbnails are clickable to re-view; hover to download.
 
-### `muapi.js` (The Engine)
-Encapsulates all communication with `api.muapi.ai`.
-- **Authentication:** Uses `x-api-key` header (NOT `Authorization: Bearer`).
+### `replicate.js` (The Engine)
+Encapsulates all communication with `api.replicate.com`.
+- **Authentication:** Uses `Authorization: Bearer {token}` header.
 - **Pattern:** Submit -> Poll.
-    - `POST` to endpoint (e.g., `/api/v1/nano-banana-pro`).
-    - API returns a `request_id`.
-    - `POST` / `GET` loop on `/api/v1/predictions/{id}/result` until status is `completed`, `succeeded`, or `failed`.
-- **Normalization:** The polling response structure varies. `muapi.js` normalizes the result to ensure `url` is always populated (extracting from `outputs[0]` if necessary).
+    - `POST` to `/v1/predictions` with model version and input parameters.
+    - API returns a `prediction_id`.
+    - `GET` loop on `/v1/predictions/{id}` until status is `succeeded`, `failed`, or `canceled`.
+- **Normalization:** The polling response structure returns an `output` field. `replicate.js` normalizes the result to ensure `url` is always populated (extracting from `output[0]` for array outputs).
 
 ### `models.js` (The Data)
 Contains the `t2iModels` array.
@@ -82,8 +82,8 @@ Contains the `t2iModels` array.
 
 ## 5. Development Setup
 
-- **Vite Proxy:** Local development uses a proxy in `vite.config.js` to route `/api` requests to `https://api.muapi.ai` to avoid CORS issues.
-- **Environment:** `muapi.js` detects `import.meta.env.DEV` to decide whether to use the relative `/api` path (proxy) or the full URL (production).
+- **Vite Proxy:** Local development uses a proxy in `vite.config.js` to route `/api` requests to `https://api.replicate.com` to avoid CORS issues.
+- **Environment:** `replicate.js` detects `import.meta.env.DEV` to decide whether to use the relative `/api` path (proxy) or the full URL (production).
 
 ## 6. Known Gotchas & Fixes
 
