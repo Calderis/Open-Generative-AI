@@ -4566,34 +4566,6 @@ export const i2iModels = [
     }
   },
   {
-    "id": "Api Node",
-    "name": "Api Node",
-    "endpoint": "Api Node",
-    "family": "wavespeed",
-    "imageField": "image_url",
-    "hasPrompt": false,
-    "inputs": {
-      "model_url": {
-        "type": "string",
-        "title": "Model URL",
-        "name": "model_url",
-        "description": "Url of the wavespeed model",
-        "examples": [
-          ""
-        ]
-      },
-      "api_key": {
-        "type": "string",
-        "title": "API Key",
-        "name": "api_key",
-        "description": "API key for authentication",
-        "examples": [
-          ""
-        ]
-      }
-    }
-  },
-  {
     "id": "flux-2-klein-4b-edit",
     "name": "Flux 2 Klein 4b Edit",
     "endpoint": "flux-2-klein-4b-edit",
