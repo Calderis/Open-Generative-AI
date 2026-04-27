@@ -270,10 +270,47 @@ export function uploadFile(apiKey, file, onProgress) {
 }
 
 export async function getUserBalance(apiKey) {
-    // Replicate doesn't have a balance endpoint
-    // Return null to indicate balance is not available
-    // Users can check their account at replicate.com/account
-    return { balance: null };
+    try {
+        // First, get the username using the account endpoint
+        const accountResponse = await fetch('https://api.replicate.com/v1/account', {
+            headers: {
+                'Authorization': `Token ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!accountResponse.ok) {
+            throw new Error(`Failed to fetch account info: ${accountResponse.status}`);
+        }
+        
+        const accountData = await accountResponse.json();
+        const username = accountData.username;
+        
+        if (!username) {
+            throw new Error('No username found in account data');
+        }
+        
+        // Then fetch the unused credit using the frontend billing endpoint
+        const creditResponse = await fetch(`https://replicate.com/api/frontend/billing/users/${username}/unused-credit`, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!creditResponse.ok) {
+            throw new Error(`Failed to fetch credit balance: ${creditResponse.status}`);
+        }
+        
+        const creditData = await creditResponse.json();
+        const balance = parseFloat(creditData.unused_credit);
+        
+        return { balance: isNaN(balance) ? null : balance };
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+        // Return null on error to gracefully handle any issues
+        return { balance: null };
+    }
 }
 
 export async function getTemplateWorkflows(apiKey) {
