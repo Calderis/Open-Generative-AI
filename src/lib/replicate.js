@@ -264,6 +264,8 @@ export class ReplicateClient {
             if (params.onRequestId) params.onRequestId(predictionId);
 
             console.log('[Replicate] Polling for video results, prediction_id:', predictionId);
+            // Video generation can take 15-30 minutes for high-quality outputs
+            // 900 attempts × 2 seconds = 30 minute maximum timeout
             const result = await this.pollForResult(predictionId, key, 900, 2000);
 
             const videoUrl = Array.isArray(result.output) ? result.output[0] : result.output;
