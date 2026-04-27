@@ -1,6 +1,8 @@
 import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV2VModelById, getLipSyncModelById } from './models.js';
 
-const BASE_URL = 'https://api.replicate.com';
+// Use proxy path to avoid CORS errors in development
+// The Next.js middleware rewrites /api/v1/* to https://api.replicate.com/v1/*
+const BASE_URL = '/api';
 
 // Maximum file size for data URL conversion (4MB)
 const MAX_DATA_URL_FILE_SIZE = 4 * 1024 * 1024;
@@ -272,7 +274,7 @@ export function uploadFile(apiKey, file, onProgress) {
 export async function getUserBalance(apiKey) {
     try {
         // First, get the username using the account endpoint
-        const accountResponse = await fetch('https://api.replicate.com/v1/account', {
+        const accountResponse = await fetch('/api/v1/account', {
             headers: {
                 'Authorization': `Token ${apiKey}`,
                 'Content-Type': 'application/json'

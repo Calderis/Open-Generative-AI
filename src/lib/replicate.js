@@ -6,7 +6,9 @@ const MAX_FILE_SIZE_MB = 4;
 
 export class ReplicateClient {
     constructor() {
-        this.baseUrl = 'https://api.replicate.com';
+        // Use proxy path to avoid CORS errors in development
+        // The Next.js middleware rewrites /api/v1/* to https://api.replicate.com/v1/*
+        this.baseUrl = '/api';
     }
 
     getKey() {
