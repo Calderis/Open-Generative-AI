@@ -344,6 +344,26 @@ export async function unpublishAgent(apiKey, agentId) {
     throw new Error('Agent publishing not supported with Replicate provider');
 }
 
+export async function createWorkflow(apiKey, payload) {
+    throw new Error('Workflow features not supported with Replicate provider');
+}
+
+export async function updateWorkflowName(apiKey, workflowId, name) {
+    throw new Error('Workflow features not supported with Replicate provider');
+}
+
+export async function getWorkflowInputs(apiKey, workflowId) {
+    throw new Error('Workflow features not supported with Replicate provider');
+}
+
+export async function getAllNodeSchemas(apiKey, workflowId) {
+    throw new Error('Workflow features not supported with Replicate provider');
+}
+
+export async function getWorkflowData(apiKey, workflowId) {
+    throw new Error('Workflow features not supported with Replicate provider');
+}
+
 export async function saveWorkflow(apiKey, workflowData) {
     throw new Error('Workflow features not supported with Replicate provider');
 }
