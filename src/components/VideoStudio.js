@@ -1,4 +1,4 @@
-import { muapi } from '../lib/muapi.js';
+import replicate from '../lib/replicate.js';
 import { t2vModels, getAspectRatiosForVideoModel, getDurationsForModel, getResolutionsForVideoModel, i2vModels, getAspectRatiosForI2VModel, getDurationsForI2VModel, getResolutionsForI2VModel, v2vModels, getModesForModel } from '../lib/models.js';
 import { AuthModal } from './AuthModal.js';
 import { createUploadPicker } from './UploadPicker.js';
@@ -193,7 +193,7 @@ export function VideoStudio() {
         const file = e.target.files[0];
         if (!file) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = localStorage.getItem('replicate_key');
         if (!apiKey) {
             AuthModal(() => videoFileInput.click());
             return;
@@ -201,7 +201,7 @@ export function VideoStudio() {
 
         showVideoSpinner();
         try {
-            const url = await muapi.uploadFile(file);
+            const url = await replicate.uploadFile(file);
             uploadedVideoUrl = url;
             showVideoReady(file.name);
 
@@ -868,7 +868,7 @@ export function VideoStudio() {
         const pending = getPendingJobs('video');
         if (!pending.length) return;
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = localStorage.getItem('replicate_key');
         if (!apiKey) return; // can't poll without key; jobs remain for next time
 
         const banner = document.createElement('div');
@@ -881,7 +881,7 @@ export function VideoStudio() {
             const elapsedAttempts = Math.floor((Date.now() - job.submittedAt) / job.interval);
             const attemptsLeft = Math.max(1, job.maxAttempts - elapsedAttempts);
             try {
-                const result = await muapi.pollForResult(job.requestId, apiKey, attemptsLeft, job.interval);
+                const result = await replicate.pollForResult(job.requestId, apiKey, attemptsLeft, job.interval);
                 const url = result.outputs?.[0] || result.url || result.output?.url;
                 if (url) {
                     addToHistory({ id: job.requestId, url, ...job.historyMeta, timestamp: new Date().toISOString() });
@@ -980,7 +980,7 @@ export function VideoStudio() {
             }
         }
 
-        const apiKey = localStorage.getItem('muapi_key');
+        const apiKey = localStorage.getItem('replicate_key');
         if (!apiKey) {
             AuthModal(() => generateBtn.click());
             return;
@@ -1001,7 +1001,7 @@ export function VideoStudio() {
 
         try {
             if (v2vMode) {
-                const res = await muapi.processV2V({ model: selectedModel, video_url: uploadedVideoUrl, onRequestId });
+                const res = await replicate.processV2V({ model: selectedModel, video_url: uploadedVideoUrl, onRequestId });
                 console.log('[VideoStudio] V2V response:', res);
                 if (res && res.url) {
                     if (capturedRequestId) removePendingJob(capturedRequestId);
@@ -1034,7 +1034,7 @@ export function VideoStudio() {
                 if (selectedMode) i2vParams.mode = selectedMode;
                 if (selectedEffectName) i2vParams.name = selectedEffectName;
 
-                const res = await muapi.generateI2V(i2vParams);
+                const res = await replicate.generateI2V(i2vParams);
                 console.log('[VideoStudio] I2V response:', res);
 
                 if (res && res.url) {
@@ -1077,7 +1077,7 @@ export function VideoStudio() {
             if (selectedQuality) params.quality = selectedQuality;
             if (selectedMode) params.mode = selectedMode;
 
-            const res = await muapi.generateVideo(params);
+            const res = await replicate.generateVideo(params);
 
             console.log('[VideoStudio] Full response:', res);
 
