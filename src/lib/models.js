@@ -4105,57 +4105,6 @@ export const i2iModels = [
     }
   },
   {
-    "id": "nano-banana-pro-edit",
-    "name": "Nano Banana Pro Edit",
-    "endpoint": "nano-banana-pro-edit",
-    "family": "nano",
-    "imageField": "images_list",
-    "hasPrompt": true,
-    "maxImages": 8,
-    "inputs": {
-      "prompt": {
-        "type": "string",
-        "title": "Prompt",
-        "name": "prompt",
-        "description": "Text prompt describing the image, what you want the final edited image to look like.",
-        "examples": [
-          "Keep the same scene and subject, but change the lighting to warm golden sunset tones, remove the neon signs, add soft sunlight beams from the side, enhance surface details, keep reflections subtle and natural."
-        ]
-      },
-      "aspect_ratio": {
-        "type": "string",
-        "title": "Aspect Ratio",
-        "name": "aspect_ratio",
-        "description": "Aspect ratio of the output image.",
-        "enum": [
-          "1:1",
-          "3:4",
-          "4:3",
-          "9:16",
-          "16:9",
-          "3:2",
-          "2:3",
-          "5:4",
-          "4:5",
-          "21:9"
-        ],
-        "default": "1:1"
-      },
-      "resolution": {
-        "type": "string",
-        "title": "Resolution",
-        "name": "resolution",
-        "description": "The target resolution of the generated image.",
-        "enum": [
-          "1k",
-          "2k",
-          "4k"
-        ],
-        "default": "1k"
-      }
-    }
-  },
-  {
     "id": "image-passthrough",
     "name": "Image Passthrough",
     "endpoint": "image-passthrough",
