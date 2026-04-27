@@ -270,9 +270,10 @@ export function uploadFile(apiKey, file, onProgress) {
 }
 
 export async function getUserBalance(apiKey) {
-    // Replicate doesn't have a balance endpoint in the same way
-    // You'd need to check your account page or implement a custom solution
-    throw new Error('Balance checking not supported with Replicate provider. Check your account at replicate.com/account');
+    // Replicate doesn't have a balance endpoint
+    // Return null to indicate balance is not available
+    // Users can check their account at replicate.com/account
+    return { balance: null };
 }
 
 export async function getTemplateWorkflows(apiKey) {
