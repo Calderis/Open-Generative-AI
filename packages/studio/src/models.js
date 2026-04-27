@@ -2106,6 +2106,7 @@ export const t2iModels = [
   {
     id: "bytedance-seedream-v5-lite",
     name: "Seedream 5 Lite",
+    replicateModel: "bytedance/seedream-5-lite",
     inputs: {
       prompt: {
         type: "string",

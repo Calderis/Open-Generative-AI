@@ -8,6 +8,40 @@ const BASE_URL = '/api';
 const MAX_DATA_URL_FILE_SIZE = 4 * 1024 * 1024;
 const MAX_FILE_SIZE_MB = 4;
 
+// Cache for model versions to avoid repeated API calls
+const versionCache = new Map();
+
+async function getModelVersion(replicateModel, apiKey) {
+    // Check cache first
+    if (versionCache.has(replicateModel)) {
+        return versionCache.get(replicateModel);
+    }
+    
+    // Fetch model info from Replicate API
+    const url = `${BASE_URL}/v1/models/${replicateModel}`;
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Failed to get model version: ${response.status} ${response.statusText}`);
+    }
+    
+    const modelData = await response.json();
+    const version = modelData.latest_version?.id;
+    
+    if (!version) {
+        throw new Error(`No version found for model ${replicateModel}`);
+    }
+    
+    // Cache the version
+    versionCache.set(replicateModel, version);
+    
+    return version;
+}
+
 async function pollForResult(predictionId, key, maxAttempts = 900, interval = 2000) {
     const pollUrl = `${BASE_URL}/v1/predictions/${predictionId}`;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -79,7 +113,16 @@ async function submitAndPoll(modelVersion, input, key, onRequestId, maxAttempts 
 
 export async function generateImage(apiKey, params) {
     const modelInfo = getModelById(params.model);
-    const modelVersion = modelInfo?.replicateVersion || modelInfo?.endpoint || params.model;
+    
+    // Get model version - either from cache/API or fallback to hardcoded value
+    let modelVersion;
+    if (modelInfo?.replicateModel) {
+        // Fetch latest version from Replicate API
+        modelVersion = await getModelVersion(modelInfo.replicateModel, apiKey);
+    } else {
+        // Fallback to hardcoded version or endpoint
+        modelVersion = modelInfo?.replicateVersion || modelInfo?.endpoint || params.model;
+    }
     
     const input = { prompt: params.prompt };
     
@@ -152,7 +195,16 @@ export async function generateI2I(apiKey, params) {
 
 export async function generateVideo(apiKey, params) {
     const modelInfo = getVideoModelById(params.model);
-    const modelVersion = modelInfo?.replicateVersion || modelInfo?.endpoint || params.model;
+    
+    // Get model version - either from cache/API or fallback to hardcoded value
+    let modelVersion;
+    if (modelInfo?.replicateModel) {
+        // Fetch latest version from Replicate API
+        modelVersion = await getModelVersion(modelInfo.replicateModel, apiKey);
+    } else {
+        // Fallback to hardcoded version or endpoint
+        modelVersion = modelInfo?.replicateVersion || modelInfo?.endpoint || params.model;
+    }
     
     const input = {};
     if (params.prompt) input.prompt = params.prompt;
