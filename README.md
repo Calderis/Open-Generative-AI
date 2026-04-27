@@ -16,7 +16,7 @@
 
 ## 🌐 Try it Online — No Install Required
 
-**Hosted version:** [https://dev.muapi.ai/open-generative-ai](https://dev.muapi.ai/open-generative-ai)
+**Hosted version:** [https://dev.muapi.ai/open-generative-ai](https://dev.muapi.ai/open-generative-ai) (Note: The hosted version still uses Muapi. Self-hosted version now uses Replicate.)
 
 Use all four studios (Image, Video, Lip Sync, Cinema) directly in your browser — no Node.js, no setup. Sign up for a free account to start generating. The hosted version is always up to date with the latest models.
 
@@ -115,7 +115,7 @@ echo 'kernel.apparmor_restrict_unprivileged_userns=0' | sudo tee /etc/sysctl.d/9
 
 ---
 
-Open Generative AI is a free, uncensored, open-source AI image, video, cinema, and lip sync studio that brings unrestricted creative workflows to everyone. No content filters, no prompt rejections, no guardrails — just full creative freedom. Powered by [Muapi.ai](https://muapi.ai), it supports text-to-image, image-to-image, text-to-video, image-to-video, and audio-driven lip sync generation across models like Flux, Nano Banana, Midjourney, Kling, Sora, Veo, Seedream, Infinite Talk, LTX Lipsync, Wan 2.2, and more — all from a sleek, modern interface you can self-host and customize.
+Open Generative AI is a free, uncensored, open-source AI image, video, cinema, and lip sync studio that brings unrestricted creative workflows to everyone. No content filters, no prompt rejections, no guardrails — just full creative freedom. Powered by [Replicate.com](https://replicate.com), it supports text-to-image, image-to-image, text-to-video, image-to-video, and audio-driven lip sync generation across models like Flux, Nano Banana, Midjourney, Kling, Sora, Veo, Seedream, Infinite Talk, LTX Lipsync, Wan 2.2, and more — all from a sleek, modern interface you can self-host and customize.
 
 **Why Open Generative AI instead of Higgsfield AI, Freepik, Krea AI, Openart AI?**
 - **Uncensored & unrestricted** — no content filters, no nanny guardrails, no prompt rejections
@@ -239,7 +239,7 @@ A healthy run on Apple Silicon prints `total params memory size = 1969.78MB (VRA
 - **Smart Controls** — Dynamic aspect ratio, resolution/quality, and duration pickers that adapt to each model's capabilities (including t2i models with resolution or quality options)
 - **Generation History** — Browse, revisit, and download all past generations (persisted in browser storage)
 - **Image & Video Download** — One-click download of generated outputs in full resolution
-- **API Key Management** — Secure API key storage in browser localStorage (never sent to any server except Muapi)
+- **API Key Management** — Secure API key storage in browser localStorage (never sent to any server except Replicate)
 - **Responsive Design** — Works seamlessly on desktop and mobile with dark glassmorphism UI
 
 ### 🖼️ Image Studio — Dual Mode
@@ -355,7 +355,7 @@ The **Workflow Studio** lets you build and run multi-step AI pipelines without w
 - **Community** — Browse and run workflows published by other users
 - **Node-based Builder** — Drag-and-drop visual editor to connect models and route outputs between steps
 - **Playground** — Run any workflow interactively with a form UI; results render inline
-- **API execution** — Every workflow is also callable via the Muapi API
+- **API execution** — Every workflow is also callable via the Replicate API
 
 > 💡 **Want to add workflows to your own app?** Check out **[Vibe Workflow](https://github.com/SamurAIGPT/Vibe-Workflow)** — the open-source workflow engine powering this feature. Drop it into any project.
 
@@ -387,7 +387,7 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+)
-- A [Muapi.ai](https://muapi.ai) API key
+- A [Replicate.com](https://replicate.com) API key (get one at [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens))
 
 ### Setup
 
@@ -406,7 +406,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser. You'll be prompted to enter your Muapi API key on first use.
+Open `http://localhost:3000` in your browser. You'll be prompted to enter your Replicate API key on first use.
 
 ### Production Build
 
@@ -454,7 +454,8 @@ Open-Generative-AI/
 │       └── src/
 │           ├── index.js        # Exports: ImageStudio, VideoStudio, LipSyncStudio, CinemaStudio, WorkflowStudio
 │           ├── models.js       # 200+ model definitions (single source of truth)
-│           ├── muapi.js        # API client (named exports, apiKey as first param)
+│           ├── replicate.js    # API client (named exports, apiKey as first param)
+│           ├── muapi.js        # Legacy API client (deprecated)
 │           └── components/
 │               ├── ImageStudio.jsx    # Dual-mode t2i/i2i studio
 │               ├── VideoStudio.jsx    # Dual-mode t2v/i2v studio
@@ -466,16 +467,16 @@ Open-Generative-AI/
 └── package.json                # workspaces: ["packages/studio"]
 ```
 
-The `packages/studio` library is also consumed by the hosted version on [muapi.ai](https://muapi.ai) — model updates made in `packages/studio/src/models.js` apply to both the self-hosted app and the hosted version automatically.
+The `packages/studio` library supports both Replicate (default) and the legacy Muapi provider — model updates made in `packages/studio/src/models.js` apply universally.
 
 ## 🔌 API Integration
 
-The app communicates with [Muapi.ai](https://muapi.ai) using a two-step pattern:
+The app communicates with [Replicate.com](https://replicate.com) using a standard predictions API:
 
-1. **Submit** — `POST /api/v1/{model-endpoint}` with prompt and parameters
-2. **Poll** — `GET /api/v1/predictions/{request_id}/result` until status is `completed`
+1. **Submit** — `POST /v1/predictions` with model version and input parameters
+2. **Poll** — `GET /v1/predictions/{prediction_id}` until status is `succeeded`
 
-Authentication uses the `x-api-key` header. During development, a Vite proxy handles CORS by routing `/api` requests to `https://api.muapi.ai`.
+Authentication uses the `Authorization: Bearer {token}` header. File uploads are handled as data URLs for small files, or you can host files externally (e.g., on S3 or CDN) and pass URLs to Replicate.
 
 File uploads use `POST /api/v1/upload_file` (multipart/form-data) and return a hosted URL that is passed to image-conditioned models. For multi-image models the full `images_list` array is forwarded to the API in one request.
 
@@ -497,7 +498,7 @@ Lip sync jobs use the same two-step pattern: a dedicated `processLipSync()` meth
 - **React 18** — Studio UI components
 - **Tailwind CSS v3** — Utility-first styling
 - **npm workspaces** — Monorepo with shared `packages/studio` library
-- **Muapi.ai** — AI model API gateway
+- **Replicate.com** — AI model API platform
 
 ## 🤔 How is this different from Higgsfield AI, Freepik, Krea, Openart AI?
 
@@ -523,7 +524,7 @@ MIT
 
 ## 🙏 Credits
 
-Built with [Muapi.ai](https://muapi.ai) — the unified API for AI image and video generation models.
+Built with [Replicate.com](https://replicate.com) — the platform for running AI models in the cloud.
 
 ---
 **Deep Dive**: For more details on the "AI Influencer" engine, upcoming "Popcorn" storyboarding features, and the future of this project, read the [full technical overview](https://medium.com/@anilmatcha/).

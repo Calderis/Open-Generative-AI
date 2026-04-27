@@ -3,12 +3,14 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     base: './',
     server: {
-        proxy: {
-            '/api': {
-                target: 'https://api.muapi.ai',
-                changeOrigin: true,
-                secure: false
-            }
-        }
+        // Replicate API doesn't need a proxy - requests go directly to api.replicate.com
+        // Uncomment below if you need to proxy API requests during development
+        // proxy: {
+        //     '/api': {
+        //         target: 'https://api.replicate.com',
+        //         changeOrigin: true,
+        //         secure: false
+        //     }
+        // }
     }
 });
