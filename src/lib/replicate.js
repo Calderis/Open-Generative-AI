@@ -2,6 +2,7 @@ import { getModelById, getVideoModelById, getI2IModelById, getI2VModelById, getV
 
 // Maximum file size for data URL conversion (4MB)
 const MAX_DATA_URL_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 4;
 
 export class ReplicateClient {
     constructor() {
@@ -440,7 +441,7 @@ export class ReplicateClient {
         
         return new Promise((resolve, reject) => {
             if (file.size > MAX_DATA_URL_FILE_SIZE) {
-                reject(new Error(`File too large for data URL (max ${MAX_DATA_URL_FILE_SIZE / (1024 * 1024)}MB). Please use an external CDN.`));
+                reject(new Error(`File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). Please use an external CDN.`));
                 return;
             }
 

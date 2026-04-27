@@ -152,7 +152,8 @@ If you need to rollback to Muapi:
 
 ## Notes
 
-- The hosted version at dev.muapi.ai still uses Muapi (unchanged)
+- The hosted version at dev.muapi.ai will continue to use Muapi for the foreseeable future
 - Self-hosted version now uses Replicate by default
 - Both providers can coexist if needed (keep both client files)
 - Consider adding provider selection in settings for flexibility
+- This migration allows self-hosted users to use Replicate's infrastructure while maintaining compatibility

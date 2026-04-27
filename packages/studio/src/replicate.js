@@ -4,6 +4,7 @@ const BASE_URL = 'https://api.replicate.com';
 
 // Maximum file size for data URL conversion (4MB)
 const MAX_DATA_URL_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 4;
 
 async function pollForResult(predictionId, key, maxAttempts = 900, interval = 2000) {
     const pollUrl = `${BASE_URL}/v1/predictions/${predictionId}`;
@@ -180,11 +181,11 @@ export async function generateI2V(apiKey, params) {
 }
 
 export async function generateMarketingStudioAd(apiKey, params) {
-    // Marketing studio ads require a specific Replicate model
+    // Marketing studio ad generation requires a specific Replicate model
     // This should be configured with an actual model version
     const modelVersion = params.replicateVersion;
     if (!modelVersion) {
-        throw new Error('Marketing Studio requires a valid Replicate model version. Please configure replicateVersion in model settings.');
+        throw new Error('Marketing Studio Ad generation requires a valid Replicate model version. Please configure replicateVersion in model settings.');
     }
     
     const input = {
@@ -219,7 +220,7 @@ export function uploadFile(apiKey, file, onProgress) {
         // Replicate doesn't have a file upload endpoint
         // Convert to data URL for small files
         if (file.size > MAX_DATA_URL_FILE_SIZE) {
-            reject(new Error(`File too large for data URL (max ${MAX_DATA_URL_FILE_SIZE / (1024 * 1024)}MB). Please host files externally.`));
+            reject(new Error(`File too large for data URL (max ${MAX_FILE_SIZE_MB}MB). Please host files externally.`));
             return;
         }
 
